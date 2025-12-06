@@ -17,6 +17,7 @@ import ragRoute from './routes/rag.route';
 import imageRoute from './routes/image.route';
 import compareRoute from './routes/compare.route';
 import identityRoute from './routes/identity.route';
+import resumeRoute from './routes/resume.route';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/rag', ragRoute);
 app.use('/api/image', imageRoute);
 app.use('/api/compare', compareRoute);
 app.use('/api/identity', identityRoute);
+app.use('/api/resume', resumeRoute);
 
 // Swagger
 const swaggerDocs = swaggerJsdoc(swaggerOptions);

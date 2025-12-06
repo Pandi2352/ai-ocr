@@ -16,9 +16,9 @@ A powerful backend service built with Node.js, Express, and Google Gemini AI tha
   - **Auto-filling Forms**: "Smart Mapper" that takes a target JSON schema (e.g., from a KYC form) and intelligently maps extracted content to it, transforming formats as needed.
   - **RAG Chatbot**: Chat with your documents. Supports "Single Turn Search" (Direct Q&A) and "Multi-Turn Chat" (Conversational with history). Includes **Lazy Ingestion** (auto-indexing).
   - **Image Generation**: Generates a high-quality photorealistic image of the document based on the extracted content (e.g., recreating an ID card or Invoice view). Uses advanced prompting to ensure text accuracy and legibility.
-  - **Smart Workspace (Folders)**: Create folders to organize documents. Upload files directly into specific folders for better project management.
   - **Advanced Document Comparison**: Intelligently compares two documents (Original vs New) to identify distinct changes (added, removed, modified). Categorizes changes by severity (Critical, High, Medium, Low) and type (Financial, Legal, Formatting).
   - **Identity Verification & Fraud Detection**: Performs forensic analysis between two ID documents. Checks for **Face Matching** (Photo-to-Photo), **Address Consistency** (Fuzzy matching), **Fraud Indicators** (Tampering, Font mismatch), and extracts dynamic fields for comparison.
+  - **Resume Parsing & Job Matching**: Parses candidate resumes and intelligently scores them against a provided Job Description. Extracts Skills, Experience, and Education, then generates a Match Score (0-100) with detailed gap analysis.
 - **Asynchronous Processing**: Immediate API response with background polling for heavy tasks.
 - **Robust Tracking**: Detailed status tracking (upload, visual processing, enrichment) and timing metrics.
 - **Swagger Documentation**: Built-in API docs for easy testing.
@@ -98,13 +98,11 @@ Once the server is running, visit the Swagger UI for interactive documentation:
 | **POST** | `/api/rag/search`     | **Single-Turn Q&A**. Ask a question, get a direct answer. (Auto-indexes document).             |
 | **POST** | `/api/rag/chat`       | **Multi-Turn Chat**. Conversational interface supporting history.                              |
 | **POST** | `/api/image/generate` | **Generate Image**. Creates a visual representation of the document based on OCR data.         |
-| **POST** | `/api/compare`        | **Compare Documents**. Analyze changes between a Source and Target document.                   |
-| **POST** | `/api/folders`        | **Create Folder**. Create a new workspace folder.                                              |
-| **GET**  | `/api/folders`        | **List Folders**. Get all workspace folders.                                                   |
-| **POST** | `/api/folders/:id/upload` | **Upload to Folder**. Upload and analyze a file within a specific folder.                  |
-| **GET**  | `/api/folders/:id/documents` | **List Folder Documents**. Get all files inside a specific folder.                      |
+| **POST** | `/api/compare`        | **Compare Documents**. Analyze changes between a Source and Target document.                    |
 | **POST** | `/api/identity/verify`| **Verify Identity**. Forensic comparison of two documents (Face, Fraud, Data).                 |
 | **GET**  | `/api/identity/history`| **Identity History**. Get past verification results.                                           |
+| **POST** | `/api/resume/analyze` | **Analyze Resume**. Parse resume and match against JD.                                         |
+| **GET**  | `/api/resume/history` | **Resume History**. Get past analysis results.                                                 |
 | **GET**  | `/api/ocr/list`       | List all processed files with pagination.                                                      |
 | **POST** | `/api/ai/generate`    | (Test) Simple text generation with Gemini.                                                     |
 | **GET**  | `/health`             | Server health check.                                                                           |
@@ -146,20 +144,22 @@ Once the server is running, visit the Swagger UI for interactive documentation:
     - AI analyzes the document content (and any extracted entities) to construct a highly specific prompt.
     - Generates a photorealistic image mirroring the document's data.
     - Saves the image to the server (`uploads/generated/`) and returns the public URL.
-11. **Folder Organization**:
-    - Create a folder via `/api/folders`.
-    - Upload files to it via `/api/folders/:id/upload`.
-    - Files are processed identically to standard uploads but are tagged with `folderId`.
-12. **Document Comparison**:
+11. **Document Comparison**:
     - Select two document IDs (Source & Target).
     - Call `/api/compare` with `{ "sourceId": "...", "targetId": "..." }`.
     - AI analyzes the text of both documents side-by-side.
     - Returns a JSON report detailing every change, its severity, and category.
-13. **Identity Verification**:
+12. **Identity Verification**:
     - Select two document IDs (e.g., ID Card and Uploaded Selfie/Doc).
     - Call `/api/identity/verify` with `{ "docA_Id": "...", "docB_Id": "..." }`.
     - AI performs multi-modal checks: Face Match, Text Anti-Fraud, Address Match.
     - Returns a strict 8-part JSON report with a Final Verdict (Approved/Rejected/Review).
+12. **Resume Parsing & Matching**:
+    - Upload a resume via `/api/ocr/analyze` to get an `ocrId`.
+    - Call `/api/resume/analyze` with `{ "ocrId": "...", "job_description": "..." }`.
+    - AI extracts candidate profile (Skills, Experience, Projects).
+    - AI matches candidate against JD and calculates a Match %, identifying Gaps and Missing Skills.
+    - Returns a comprehensive JSON report.
 
 ## 📂 Project Structure
 
