@@ -178,3 +178,30 @@ Expected JSON Structure:
 ${JSON.stringify(jsonStructure, null, 2)}
 `;
 };
+
+export const generateFormPrompt = (schema: any): string => {
+    return `
+You are an intelligent form-filling assistant. Your task is to map extracted text from a document to a strictly defined JSON schema.
+
+**Input Schema**:
+${JSON.stringify(schema, null, 2)}
+
+**Instructions**:
+1.  **Map Data**: Find the values in the text that correspond to the keys in the Input Schema.
+2.  **Transform**: Convert the found data to match the format implied by the schema values (e.g., if schema says "DD-MM-YYYY", convert "May 12, 1990" to "12-05-1990").
+3.  **Missing Fields**: If a field from the schema is NOT found in the text, do NOT invent data. Instead, list the key in the "missing_fields" array.
+4.  **Structure**: Return a JSON object with two top-level keys: "form_data" (containing the mapped values) and "missing_fields" (array of strings).
+
+**Example Output**:
+{
+  "form_data": {
+    "full_name": "John Doe",
+    "dob": "12-05-1990"
+  },
+  "missing_fields": ["passport_number"]
+}
+
+Return ONLY the JSON object.
+`;
+};
+
