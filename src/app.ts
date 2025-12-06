@@ -15,6 +15,7 @@ import formRoute from './routes/form.route';
 import { swaggerOptions } from './config/swagger';
 import ragRoute from './routes/rag.route';
 import imageRoute from './routes/image.route';
+import compareRoute from './routes/compare.route';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/summary', summaryRoute);
 app.use('/api/forms', formRoute);
 app.use('/api/rag', ragRoute);
 app.use('/api/image', imageRoute);
+app.use('/api/compare', compareRoute);
 
 // Swagger
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
