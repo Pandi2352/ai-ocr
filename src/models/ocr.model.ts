@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { generateUUID } from '../utils/uuid';
 
-export interface IOCRResult extends Document {
+export interface IOCRResult extends Omit<Document, '_id'> {
+    _id: string;
     filename: string;
     originalName: string;
     mimetype: string;
@@ -11,6 +13,7 @@ export interface IOCRResult extends Document {
         description: string;
         thumbnail: string;
     };
+    mindmap: string;
     timing: {
         startTime: Date;
         endTime?: Date;
@@ -19,6 +22,7 @@ export interface IOCRResult extends Document {
     status: {
         upload: 'PENDING' | 'SUCCESS' | 'FAILED';
         visualProcessing: 'PENDING' | 'SUCCESS' | 'FAILED';
+        enrichment: 'PENDING' | 'SUCCESS' | 'FAILED';
         rag: 'PENDING' | 'SUCCESS' | 'FAILED' | 'SKIPPED';
         overall: 'PENDING' | 'SUCCESS' | 'FAILED';
     };
@@ -27,6 +31,7 @@ export interface IOCRResult extends Document {
 
 const OCRResultSchema: Schema = new Schema(
     {
+        _id: { type: String, default: generateUUID },
         filename: { type: String, required: true },
         originalName: { type: String, required: true },
         mimetype: { type: String, required: true },
@@ -37,6 +42,7 @@ const OCRResultSchema: Schema = new Schema(
             description: { type: String, default: '' },
             thumbnail: { type: String, default: '' },
         },
+        mindmap: { type: String, default: '' },
         timing: {
             startTime: { type: Date, required: true },
             endTime: { type: Date },
@@ -45,6 +51,7 @@ const OCRResultSchema: Schema = new Schema(
         status: {
             upload: { type: String, enum: ['PENDING', 'SUCCESS', 'FAILED'], default: 'PENDING' },
             visualProcessing: { type: String, enum: ['PENDING', 'SUCCESS', 'FAILED'], default: 'PENDING' },
+            enrichment: { type: String, enum: ['PENDING', 'SUCCESS', 'FAILED'], default: 'PENDING' },
             rag: { type: String, enum: ['PENDING', 'SUCCESS', 'FAILED', 'SKIPPED'], default: 'SKIPPED' },
             overall: { type: String, enum: ['PENDING', 'SUCCESS', 'FAILED'], default: 'PENDING' },
         },
@@ -53,3 +60,4 @@ const OCRResultSchema: Schema = new Schema(
 );
 
 export const OCRResult = mongoose.model<IOCRResult>('OCRResult', OCRResultSchema);
+

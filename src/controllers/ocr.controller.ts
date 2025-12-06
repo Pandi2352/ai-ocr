@@ -11,7 +11,8 @@ import {
     IMAGE_CONTEXT_PROMPT,
     AUDIO_CONTEXT_PROMPT,
     VIDEO_CONTEXT_PROMPT,
-    META_JSON_PROMPT
+    META_JSON_PROMPT,
+    ENRICHMENT_PROMPT
 } from '../utils/prompts';
 import { logger } from '../utils/logger';
 import { OCRResult } from '../models/ocr.model';
@@ -25,9 +26,85 @@ const readTextFile = async (filePath: string): Promise<string> => {
     return fs.promises.readFile(filePath, 'utf-8');
 };
 
+// Background Task Function
+const runBackgroundEnrichment = async (ocrId: string, filePath: string, mimetype: string, fileUri?: string) => {
+    logger.info(`Starting background enrichment for ${ocrId}`);
+
+    try {
+        const ocrRecord = await OCRResult.findById(ocrId);
+        if (!ocrRecord) {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            return;
+        }
+
+        let enrichmentResultString = '';
+        let prompt = ENRICHMENT_PROMPT;
+
+        if (fileUri) {
+            enrichmentResultString = await generateMultimodalContent(prompt, { mimeType: mimetype, fileUri: fileUri });
+        } else {
+            prompt = `${ENRICHMENT_PROMPT}\n\nCONTEXT:\n${ocrRecord.analysis}`;
+            enrichmentResultString = await generateText(prompt);
+        }
+
+        // 1. Extract JSON Metadata
+        let enrichmentData: any = { mermaid: '' };
+        try {
+            const jsonMatch = enrichmentResultString.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                enrichmentData = JSON.parse(jsonMatch[0]);
+            }
+        } catch (e) {
+            logger.warn(`Failed to parse Enrichment JSON for ${ocrId}`);
+        }
+
+        // 2. Extract Mermaid (Priority: JSON > Markdown Block)
+        let mermaidCode = enrichmentData.mermaid || '';
+        if (!mermaidCode || mermaidCode.trim() === '') {
+            const mermaidMatch = enrichmentResultString.match(/```mermaid\n([\s\S]*?)\n```/);
+            if (mermaidMatch && mermaidMatch[1]) {
+                mermaidCode = mermaidMatch[1].trim();
+            }
+        }
+
+        // Update DB
+        ocrRecord.mindmap = mermaidCode;
+        ocrRecord.status.enrichment = 'SUCCESS';
+
+        const finalEndTime = new Date();
+        ocrRecord.timing.endTime = finalEndTime;
+        ocrRecord.timing.duration = finalEndTime.getTime() - ocrRecord.timing.startTime.getTime();
+
+        if (ocrRecord.status.visualProcessing === 'SUCCESS') {
+            ocrRecord.status.overall = 'SUCCESS';
+        }
+
+        await ocrRecord.save();
+        logger.info(`Background enrichment completed for ${ocrId}`);
+
+    } catch (error: any) {
+        logger.error(`Background enrichment failed for ${ocrId}: ${error.message}`);
+        await OCRResult.findByIdAndUpdate(ocrId, {
+            'status.enrichment': 'FAILED'
+        });
+    } finally {
+        // Safe Cleanup
+        if (fs.existsSync(filePath)) {
+            try {
+                fs.unlinkSync(filePath);
+            } catch (e) {
+                logger.warn(`Failed to delete temp file ${filePath}`);
+            }
+        }
+    }
+};
+
+
 export const analyzeFile = async (req: Request, res: Response, next: NextFunction) => {
     const startTime = new Date();
     let ocrRecord: any = null;
+    let geminiFileUri: string | undefined = undefined;
+    let shouldDeleteFileImmediately = true;
 
     try {
         if (!req.file) {
@@ -45,13 +122,13 @@ export const analyzeFile = async (req: Request, res: Response, next: NextFunctio
             originalName: req.file.originalname,
             mimetype: req.file.mimetype,
             size: req.file.size,
-            analysis: '', // Pending
-            timing: {
-                startTime: startTime
-            },
+            analysis: '',
+            mindmap: '',
+            timing: { startTime },
             status: {
                 upload: 'SUCCESS',
                 visualProcessing: 'PENDING',
+                enrichment: 'PENDING',
                 overall: 'PENDING'
             }
         });
@@ -59,42 +136,43 @@ export const analyzeFile = async (req: Request, res: Response, next: NextFunctio
         let finalPrompt = '';
         let analysisResult = '';
 
-        // Handle File Types
+        // Phase 1: Main Extraction (Sync)
         if (mimetype === 'text/plain' || mimetype === 'text/csv' || extension === 'txt' || extension === 'csv') {
             const content = await readTextFile(filePath);
             finalPrompt = `${PDF_EXTRACTION_PROMPT}\n\nDOCUMENT CONTENT:\n${content}\n\n${META_JSON_PROMPT}`;
             analysisResult = await generateText(finalPrompt);
+            shouldDeleteFileImmediately = true;
 
         } else if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || extension === 'docx') {
             const content = await extractTextFromDocx(filePath);
             finalPrompt = `${PDF_EXTRACTION_PROMPT}\n\nDOCUMENT CONTENT:\n${content}\n\n${META_JSON_PROMPT}`;
             analysisResult = await generateText(finalPrompt);
+            shouldDeleteFileImmediately = true;
 
         } else {
             // Media Files
             let contextPrompt = PDF_EXTRACTION_PROMPT;
-
-            if (mimetype.startsWith('image/')) {
-                contextPrompt = IMAGE_CONTEXT_PROMPT;
-            } else if (mimetype.startsWith('audio/')) {
-                contextPrompt = AUDIO_CONTEXT_PROMPT;
-            } else if (mimetype.startsWith('video/')) {
-                contextPrompt = VIDEO_CONTEXT_PROMPT;
-            } else if (mimetype === 'application/pdf') {
-                contextPrompt = PDF_EXTRACTION_PROMPT;
-            }
+            if (mimetype.startsWith('image/')) contextPrompt = IMAGE_CONTEXT_PROMPT;
+            else if (mimetype.startsWith('audio/')) contextPrompt = AUDIO_CONTEXT_PROMPT;
+            else if (mimetype.startsWith('video/')) contextPrompt = VIDEO_CONTEXT_PROMPT;
 
             finalPrompt = `${contextPrompt}\n\n${META_JSON_PROMPT}`;
 
             const uploadResult = await uploadFileToGemini(filePath, mimetype);
+            geminiFileUri = uploadResult.uri;
 
             analysisResult = await generateMultimodalContent(finalPrompt, {
                 mimeType: uploadResult.mimeType,
                 fileUri: uploadResult.uri
             });
+
+            // If Image, KEEP file for background processing (cropping)
+            if (mimetype.startsWith('image/')) {
+                shouldDeleteFileImmediately = false;
+            }
         }
 
-        // Parse JSON Result
+        // Parse Phase 1 JSON
         let jsonResult = { title: '', description: '', thumbnail: '' };
         let cleanAnalysis = analysisResult;
 
@@ -116,47 +194,38 @@ export const analyzeFile = async (req: Request, res: Response, next: NextFunctio
             logger.warn('Failed to parse Meta JSON');
         }
 
-        // Cleanup
-        fs.unlinkSync(filePath);
+        // Partial Cleanup
+        if (shouldDeleteFileImmediately) {
+            try { fs.unlinkSync(filePath); } catch (e) { }
+        }
 
-        // Update Record with Success
-        const endTime = new Date();
-        const duration = endTime.getTime() - startTime.getTime();
-
+        // Update Record (Phase 1 Complete)
         ocrRecord.analysis = cleanAnalysis;
         ocrRecord.metadata = jsonResult;
-        ocrRecord.timing.endTime = endTime;
-        ocrRecord.timing.duration = duration;
         ocrRecord.status.visualProcessing = 'SUCCESS';
-        ocrRecord.status.overall = 'SUCCESS';
         await ocrRecord.save();
 
-        sendSuccess(res, 'File analyzed successfully', {
+        // Trigger Background Phase
+        // Hand over the filePath if we kept it. Background task will handle deletion.
+        runBackgroundEnrichment(ocrRecord._id, filePath, mimetype, geminiFileUri);
+
+        // Send Response
+        sendSuccess(res, 'File analyzed successfully (Enrichment running in background)', {
             id: ocrRecord._id,
             status: ocrRecord.status,
-            timing: ocrRecord.timing,
             metadata: jsonResult,
             analysis: cleanAnalysis
         });
 
     } catch (error: any) {
-        // Cleanup
         if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
+            try { fs.unlinkSync(req.file.path); } catch (e) { }
         }
-
-        // Update Record with Failure
         if (ocrRecord) {
-            const endTime = new Date();
-            ocrRecord.timing.endTime = endTime;
-            ocrRecord.timing.duration = endTime.getTime() - startTime.getTime();
             ocrRecord.status.visualProcessing = 'FAILED';
             ocrRecord.status.overall = 'FAILED';
-            // Optionally save error message in analysis or new field if desired, 
-            // for now just marking status.
             await ocrRecord.save();
         }
-
         next(error);
     }
 };
@@ -170,7 +239,6 @@ export const getFileStatus = async (req: Request, res: Response, next: NextFunct
             throw new HttpException(404, 'OCR Record not found');
         }
 
-        // Calculate live duration if still running
         let duration = ocrRecord.timing.duration;
         if (ocrRecord.status.overall === 'PENDING' && ocrRecord.timing.startTime) {
             duration = new Date().getTime() - new Date(ocrRecord.timing.startTime).getTime();
@@ -184,6 +252,8 @@ export const getFileStatus = async (req: Request, res: Response, next: NextFunct
                 duration
             },
             filename: ocrRecord.originalName,
+            metadata: ocrRecord.metadata,
+            mindmap: ocrRecord.mindmap,
             createdAt: ocrRecord.createdAt
         });
 
@@ -202,7 +272,7 @@ export const getFiles = async (req: Request, res: Response, next: NextFunction) 
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limitNum)
-            .select('-analysis'); // Exclude heavy analysis content for list view
+            .select('-analysis'); // Exclude heavy fields
 
         sendSuccess(res, 'Files retrieved successfully', {
             data: files,

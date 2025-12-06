@@ -1,3 +1,43 @@
+// ... (Existing Prompts)
+
+export const ENRICHMENT_PROMPT = `
+You are an expert content analyzer and information architect. Your task is to visualize the core structure and key concepts of the provided document using a **Mermaid.js Mindmap**.
+
+**Objective**: Create a "Modern Mindmap" that maps out the central theme, main branches (key topics), and sub-branches (details/evidence).
+
+**Instructions**:
+1.  **Analyze**: Understand the central thesis and hierarchical structure of the content.
+2.  **Generate Mermaid Code**: Output valid Mermaid \`mindmap\` syntax.
+    *   Start with \`mindmap\` keyword.
+    *   Use appropriate indentation for hierarchy.
+    *   Root node should be the Document Title or Main Topic.
+    *   Keep node labels concise (1-4 words preferred).
+    *   Use icons if possible (e.g., \`(icon)\` syntax if supported/relevant, or just clean terminology).
+    *   **Style**: Aim for a balanced, radial or hierarchical structure that is easy to read.
+
+**Example Output**:
+\`\`\`mermaid
+mindmap
+  root((Central Topic))
+    Origin
+      Long history
+      Popularization
+    Key Features
+      Feature A
+      Feature B
+    Benefits
+      Efficiency
+      Clarity
+\`\`\`
+
+**Output Format**:
+Return a JSON object strictly following this structure. Do NOT wrap it in markdown code blocks like \`\`\`json ... \`\`\`, just return the raw JSON object string.
+
+{
+  "mermaid": "mindmap\\n  root((...))"
+}
+`;
+
 export const PDF_EXTRACTION_PROMPT = `**Objective:** Perform a comprehensive extraction and analysis of the provided document, including all textual content and detailed image interpretation.
 **Instructions:**
 
