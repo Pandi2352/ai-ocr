@@ -14,7 +14,8 @@ export interface IOCRResult extends Omit<Document, '_id'> {
         thumbnail: string;
     };
     mindmap: string;
-    entityResult: Record<string, any>; // Store extracted entities here too
+    entityResult: Record<string, any>;
+    summary: string; // New summary field
     timing: {
         startTime: Date;
         endTime?: Date;
@@ -45,6 +46,7 @@ const OCRResultSchema: Schema = new Schema(
         },
         mindmap: { type: String, default: '' },
         entityResult: { type: Schema.Types.Mixed, default: {} },
+        summary: { type: String, default: '' }, // New summary field
         timing: {
             startTime: { type: Date, required: true },
             endTime: { type: Date },

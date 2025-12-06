@@ -12,6 +12,7 @@ A powerful backend service built with Node.js, Express, and Google Gemini AI tha
 *   **Background Enrichment**:
     *   **Mermaid.js Mindmaps**: Automatically generates structured mindmaps representing the core content of the document.
     *   **Named Entity Extraction**: Extracts specific data (like Names, Dates, IDs) into structured JSON with **snake_case** keys. Support for both automatic detection and user-specified fields.
+    *   **Document Summarization**: Generates comprehensive summaries via API. Supports both automatic default summaries and user-guided summaries via custom prompts.
 *   **Asynchronous Processing**: Immediate API response with background polling for heavy tasks.
 *   **Robust Tracking**: Detailed status tracking (upload, visual processing, enrichment) and timing metrics.
 *   **Swagger Documentation**: Built-in API docs for easy testing.
@@ -82,6 +83,7 @@ Once the server is running, visit the Swagger UI for interactive documentation:
 | **POST** | `/api/ocr/analyze` | Upload a file for analysis. Returns an ID immediately. |
 | **GET** | `/api/ocr/status/:id` | Check analysis status and retrieve results (Extraction + Mindmap + Entities). |
 | **POST** | `/api/ocr/entities` | Extract named entities from an existing OCR result. Supports Auto/Manual modes. |
+| **POST** | `/api/ocr/summarize` | Generate a summary. Supports Auto (comprehensive) or Manual (custom instruction) modes. |
 | **GET** | `/api/ocr/list` | List all processed files with pagination. |
 | **POST** | `/api/ai/generate` | (Test) Simple text generation with Gemini. |
 | **GET** | `/health` | Server health check. |
@@ -105,6 +107,11 @@ Once the server is running, visit the Swagger UI for interactive documentation:
     *   **Auto Mode**: Send just `ocrId` -> AI detects keys (e.g., `candidate_name`, `invoice_date`).
     *   **Manual Mode**: Send `ocrId` + `fields: ["Father Name", "DOB"]` -> AI extracts specific values into snake_case keys (`father_name`, `dob`).
     *   Results are saved to both the `EntityResult` collection and the `OCRResult` document.
+7.  **Document Summarization (On-Demand)**:
+    *   Call `/api/ocr/summarize` with `ocrId`.
+    *   **Auto Mode**: Send just `ocrId` -> AI generates a detailed standard summary.
+    *   **Manual Mode**: Send `ocrId` + `prompt: "Summarize as a tweet"` -> AI follows your specific instruction.
+    *   Results are saved to both the `SummaryResult` collection and the `OCRResult` document.
 
 ## 📂 Project Structure
 

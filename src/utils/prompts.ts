@@ -146,6 +146,17 @@ You are an expert entity extractor. Your task is to automatically identify and e
 Return ONLY a valid JSON object. Do not include markdown formatting or explanations.
 `;
 
+export const AUTO_SUMMARY_PROMPT = `
+You are an expert content summarizer. Your task is to provide a comprehensive and structured summary of the provided text.
+
+**Instructions**:
+1.  **Overview**: Start with a concise 1-2 sentence overview of what the document is about.
+2.  **Key Points**: detailed bullet points covering the most important information, facts, and findings.
+3.  **Conclusion**: A brief wrap-up or conclusion based on the content.
+4.  **Tone**: Professional, neutral, and clear.
+5.  **Format**: Markdown.
+`;
+
 export const generateEntityPrompt = (fields: string[]): string => {
     const fieldsList = fields.map((f, i) => `${i + 1}. ${f}`).join('\n');
 
