@@ -55,6 +55,26 @@ export const generateMultimodalContent = async (prompt: string, fileData?: { mim
     }
 };
 
+// ... (previous code)
+
 export const generateText = async (prompt: string): Promise<string> => {
     return generateMultimodalContent(prompt);
 };
+
+/**
+ * Generates embeddings for a given text.
+ * @param text The text to embed.
+ * @returns An array of numbers representing the embedding.
+ */
+export const generateEmbeddings = async (text: string): Promise<number[]> => {
+    try {
+        // Use a model specifically for embeddings
+        const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+        const result = await embeddingModel.embedContent(text);
+        return result.embedding.values;
+    } catch (error: any) {
+        logger.error(`Error generating embeddings: ${error.message}`);
+        throw error;
+    }
+};
+

@@ -13,6 +13,7 @@ import entityRoute from './routes/entity.route';
 import summaryRoute from './routes/summary.route';
 import formRoute from './routes/form.route';
 import { swaggerOptions } from './config/swagger';
+import ragRoute from './routes/rag.route';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/ocr', ocrRoute);
 app.use('/api/entities', entityRoute);
 app.use('/api/summary', summaryRoute);
 app.use('/api/forms', formRoute);
+app.use('/api/rag', ragRoute);
 
 // Swagger
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
