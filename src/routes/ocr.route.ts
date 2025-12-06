@@ -1,6 +1,8 @@
+
 import { Router } from 'express';
 import { upload } from '../middlewares/upload.middleware';
 import { analyzeFile, getFileStatus, getFiles } from '../controllers/ocr.controller';
+import { extractEntities } from '../controllers/entity.controller';
 
 const router = Router();
 
@@ -99,6 +101,34 @@ router.get('/status/:id', getFileStatus);
 
 /**
  * @swagger
+ * /api/ocr/entities:
+ *   post:
+ *     summary: Extract named entities from OCR result
+ *     tags: [OCR]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ocrId:
+ *                 type: string
+ *                 description: valid UUID of OCR record
+ *               fields:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: (Optional) List of entities to extract. If omitted, AI automatically extracts key entities.
+ *                 example: ["Name", "DOB", "Address"]
+ *     responses:
+ *       200:
+ *         description: Extracted entities
+ */
+router.post('/entities', extractEntities);
+
+/**
+ * @swagger
  * /api/ocr/list:
  *   get:
  *     summary: List analyzed files with pagination
@@ -123,4 +153,3 @@ router.get('/status/:id', getFileStatus);
 router.get('/list', getFiles);
 
 export default router;
-

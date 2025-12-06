@@ -1,5 +1,3 @@
-// ... (Existing Prompts)
-
 export const ENRICHMENT_PROMPT = `
 You are an expert content analyzer and information architect. Your task is to visualize the core structure and key concepts of the provided document using a **Mermaid.js Mindmap**.
 
@@ -129,3 +127,43 @@ After performing the analysis requested above, you MUST append a valid JSON obje
 
 The main analysis should be free text as requested. The JSON should be at the end.
 `;
+
+export const AUTO_ENTITY_EXTRACTION_PROMPT = `
+You are an expert entity extractor. Your task is to automatically identify and extract the most significant named entities from the provided text.
+
+**Instructions**:
+1.  Analyze the text to identify key information such as:
+    *   Names (People, Organizations)
+    *   Dates (DOB, Issue Date, Expiry Date)
+    *   IDs (Aadhaar, PAN, Passport, License No)
+    *   Contact Info (Phone, Email, Address)
+    *   Financials (Amounts, Invoice Nos)
+2.  Create a JSON object where the keys are descriptive and in **snake_case** (lowercase with underscores, e.g., "candidate_name", "aadhaar_number", "phone_number").
+3.  Evaluate the values found.
+4.  Extract as many relevant entities as possible.
+
+**Output Format**:
+Return ONLY a valid JSON object. Do not include markdown formatting or explanations.
+`;
+
+export const generateEntityPrompt = (fields: string[]): string => {
+    const fieldsList = fields.map((f, i) => `${i + 1}. ${f}`).join('\n');
+
+    // Helper to convert field name to snake_case for the example structure
+    const toSnakeCase = (str: string) => str.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w_]/g, '');
+    const jsonStructure = fields.reduce((acc, curr) => ({ ...acc, [toSnakeCase(curr)]: "..." }), {});
+
+    return `
+You are an expert entity extractor. Extract the following entities from the provided text and return them in strict JSON format.
+
+Entities to extract:
+${fieldsList}
+
+If an entity is not found, set its value to null.
+Do NOT include any markdown formatting or explanations. Return ONLY the JSON object.
+**IMPORTANT**: All keys in the JSON must be in **snake_case** (lowercase with underscores).
+
+Expected JSON Structure:
+${JSON.stringify(jsonStructure, null, 2)}
+`;
+};
