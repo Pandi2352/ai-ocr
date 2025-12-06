@@ -15,6 +15,7 @@ A powerful backend service built with Node.js, Express, and Google Gemini AI tha
     *   **Document Summarization**: Generates comprehensive summaries via API. Supports both automatic default summaries and user-guided summaries via custom prompts.
     *   **Auto-filling Forms**: "Smart Mapper" that takes a target JSON schema (e.g., from a KYC form) and intelligently maps extracted content to it, transforming formats as needed.
     *   **RAG Chatbot**: Chat with your documents. Supports "Single Turn Search" (Direct Q&A) and "Multi-Turn Chat" (Conversational with history). Includes **Lazy Ingestion** (auto-indexing).
+    *   **Image Generation**: Generates a high-quality photorealistic image of the document based on the extracted content (e.g., recreating an ID card or Invoice view). Uses advanced prompting to ensure text accuracy and legibility.
 *   **Asynchronous Processing**: Immediate API response with background polling for heavy tasks.
 *   **Robust Tracking**: Detailed status tracking (upload, visual processing, enrichment) and timing metrics.
 *   **Swagger Documentation**: Built-in API docs for easy testing.
@@ -89,6 +90,7 @@ Once the server is running, visit the Swagger UI for interactive documentation:
 | **POST** | `/api/forms/fill` | Smart Form Filling. Maps OCR content to a specific target JSON schema provided in the payload. |
 | **POST** | `/api/rag/search` | **Single-Turn Q&A**. Ask a question, get a direct answer. (Auto-indexes document). |
 | **POST** | `/api/rag/chat` | **Multi-Turn Chat**. Conversational interface supporting history. |
+| **POST** | `/api/image/generate` | **Generate Image**. Creates a visual representation of the document based on OCR data. |
 | **GET** | `/api/ocr/list` | List all processed files with pagination. |
 | **POST** | `/api/ai/generate` | (Test) Simple text generation with Gemini. |
 | **GET** | `/health` | Server health check. |
@@ -125,6 +127,11 @@ Once the server is running, visit the Swagger UI for interactive documentation:
     *   **Smart Search**: Call `/api/rag/search` with `{ "question": "..." }`.
     *   **Conversational**: Call `/api/rag/chat` with `{ "question": "...", "history": [...] }`.
     *   **Lazy Ingestion**: If the document hasn't been indexed in the Vector DB yet, the system automatically chunks and indexes it before answering. No manual setup required.
+10. **Image Generation (Visual Reconstruction)**:
+    *   Call `/api/image/generate` with `{ "ocrId": "..." }`.
+    *   AI analyzes the document content (and any extracted entities) to construct a highly specific prompt.
+    *   Generates a photorealistic image mirroring the document's data.
+    *   Saves the image to the server (`uploads/generated/`) and returns the public URL.
 
 ## 📂 Project Structure
 

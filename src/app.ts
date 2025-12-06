@@ -14,6 +14,7 @@ import summaryRoute from './routes/summary.route';
 import formRoute from './routes/form.route';
 import { swaggerOptions } from './config/swagger';
 import ragRoute from './routes/rag.route';
+import imageRoute from './routes/image.route';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
+app.use('/uploads', express.static('uploads'));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -41,6 +43,7 @@ app.use('/api/entities', entityRoute);
 app.use('/api/summary', summaryRoute);
 app.use('/api/forms', formRoute);
 app.use('/api/rag', ragRoute);
+app.use('/api/image', imageRoute);
 
 // Swagger
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
