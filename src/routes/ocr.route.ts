@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { upload } from '../middlewares/upload.middleware';
 import { analyzeFile, getFileStatus, getFiles } from '../controllers/ocr.controller';
-import { extractEntities } from '../controllers/entity.controller';
-import { generateSummary } from '../controllers/summary.controller';
 
 const router = Router();
 
@@ -98,60 +96,6 @@ const router = Router();
  */
 router.post('/analyze', upload.single('file'), analyzeFile);
 router.get('/status/:id', getFileStatus);
-
-/**
- * @swagger
- * /api/ocr/entities:
- *   post:
- *     summary: Extract named entities from OCR result
- *     tags: [OCR]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               ocrId:
- *                 type: string
- *                 description: valid UUID of OCR record
- *               fields:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: (Optional) List of entities to extract. If omitted, AI automatically extracts key entities.
- *                 example: ["Name", "DOB", "Address"]
- *     responses:
- *       200:
- *         description: Extracted entities
- */
-router.post('/entities', extractEntities);
-
-/**
- * @swagger
- * /api/ocr/summarize:
- *   post:
- *     summary: Generate document summary
- *     tags: [OCR]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               ocrId:
- *                 type: string
- *                 description: valid UUID of OCR record
- *               prompt:
- *                 type: string
- *                 description: (Optional) Custom instruction for summarization. If omitted, uses auto-summary.
- *                 example: "Summarize this in 3 short bullet points"
- *     responses:
- *       200:
- *         description: Generated summary
- */
-router.post('/summarize', generateSummary);
 
 /**
  * @swagger

@@ -82,8 +82,8 @@ Once the server is running, visit the Swagger UI for interactive documentation:
 | :--- | :--- | :--- |
 | **POST** | `/api/ocr/analyze` | Upload a file for analysis. Returns an ID immediately. |
 | **GET** | `/api/ocr/status/:id` | Check analysis status and retrieve results (Extraction + Mindmap + Entities). |
-| **POST** | `/api/ocr/entities` | Extract named entities from an existing OCR result. Supports Auto/Manual modes. |
-| **POST** | `/api/ocr/summarize` | Generate a summary. Supports Auto (comprehensive) or Manual (custom instruction) modes. |
+| **POST** | `/api/entities` | Extract named entities from an existing OCR result. Supports Auto/Manual modes. |
+| **POST** | `/api/summary` | Generate a summary. Supports Auto (comprehensive) or Manual (custom instruction) modes. |
 | **GET** | `/api/ocr/list` | List all processed files with pagination. |
 | **POST** | `/api/ai/generate` | (Test) Simple text generation with Gemini. |
 | **GET** | `/health` | Server health check. |
@@ -103,12 +103,12 @@ Once the server is running, visit the Swagger UI for interactive documentation:
     *   Updates the database record with the mindmap string.
 5.  **Polling**: Client polls `/api/ocr/status/:id` until `status.enrichment` is `SUCCESS` to get the full result.
 6.  **Entity Extraction (On-Demand)**:
-    *   Check `/api/ocr/entities` with `ocrId`.
+    *   Call `/api/entities` with `ocrId`.
     *   **Auto Mode**: Send just `ocrId` -> AI detects keys (e.g., `candidate_name`, `invoice_date`).
     *   **Manual Mode**: Send `ocrId` + `fields: ["Father Name", "DOB"]` -> AI extracts specific values into snake_case keys (`father_name`, `dob`).
     *   Results are saved to both the `EntityResult` collection and the `OCRResult` document.
 7.  **Document Summarization (On-Demand)**:
-    *   Call `/api/ocr/summarize` with `ocrId`.
+    *   Call `/api/summary` with `ocrId`.
     *   **Auto Mode**: Send just `ocrId` -> AI generates a detailed standard summary.
     *   **Manual Mode**: Send `ocrId` + `prompt: "Summarize as a tweet"` -> AI follows your specific instruction.
     *   Results are saved to both the `SummaryResult` collection and the `OCRResult` document.

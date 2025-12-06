@@ -9,9 +9,9 @@ import { errorMiddleware } from './middlewares/exception.middleware';
 import healthRoute from './routes/health.route';
 import aiRoute from './routes/ai.route';
 import ocrRoute from './routes/ocr.route';
+import entityRoute from './routes/entity.route';
+import summaryRoute from './routes/summary.route';
 import { swaggerOptions } from './config/swagger';
-
-
 
 const app = express();
 
@@ -36,6 +36,8 @@ app.use(limiter);
 app.use('/health', healthRoute);
 app.use('/api/ai', aiRoute);
 app.use('/api/ocr', ocrRoute);
+app.use('/api/entities', entityRoute);
+app.use('/api/summary', summaryRoute);
 
 
 // Swagger
