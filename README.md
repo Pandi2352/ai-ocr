@@ -18,6 +18,7 @@ A powerful backend service built with Node.js, Express, and Google Gemini AI tha
   - **Image Generation**: Generates a high-quality photorealistic image of the document based on the extracted content (e.g., recreating an ID card or Invoice view). Uses advanced prompting to ensure text accuracy and legibility.
   - **Smart Workspace (Folders)**: Create folders to organize documents. Upload files directly into specific folders for better project management.
   - **Advanced Document Comparison**: Intelligently compares two documents (Original vs New) to identify distinct changes (added, removed, modified). Categorizes changes by severity (Critical, High, Medium, Low) and type (Financial, Legal, Formatting).
+  - **Identity Verification & Fraud Detection**: Performs forensic analysis between two ID documents. Checks for **Face Matching** (Photo-to-Photo), **Address Consistency** (Fuzzy matching), **Fraud Indicators** (Tampering, Font mismatch), and extracts dynamic fields for comparison.
 - **Asynchronous Processing**: Immediate API response with background polling for heavy tasks.
 - **Robust Tracking**: Detailed status tracking (upload, visual processing, enrichment) and timing metrics.
 - **Swagger Documentation**: Built-in API docs for easy testing.
@@ -102,6 +103,8 @@ Once the server is running, visit the Swagger UI for interactive documentation:
 | **GET**  | `/api/folders`        | **List Folders**. Get all workspace folders.                                                   |
 | **POST** | `/api/folders/:id/upload` | **Upload to Folder**. Upload and analyze a file within a specific folder.                  |
 | **GET**  | `/api/folders/:id/documents` | **List Folder Documents**. Get all files inside a specific folder.                      |
+| **POST** | `/api/identity/verify`| **Verify Identity**. Forensic comparison of two documents (Face, Fraud, Data).                 |
+| **GET**  | `/api/identity/history`| **Identity History**. Get past verification results.                                           |
 | **GET**  | `/api/ocr/list`       | List all processed files with pagination.                                                      |
 | **POST** | `/api/ai/generate`    | (Test) Simple text generation with Gemini.                                                     |
 | **GET**  | `/health`             | Server health check.                                                                           |
@@ -152,6 +155,11 @@ Once the server is running, visit the Swagger UI for interactive documentation:
     - Call `/api/compare` with `{ "sourceId": "...", "targetId": "..." }`.
     - AI analyzes the text of both documents side-by-side.
     - Returns a JSON report detailing every change, its severity, and category.
+13. **Identity Verification**:
+    - Select two document IDs (e.g., ID Card and Uploaded Selfie/Doc).
+    - Call `/api/identity/verify` with `{ "docA_Id": "...", "docB_Id": "..." }`.
+    - AI performs multi-modal checks: Face Match, Text Anti-Fraud, Address Match.
+    - Returns a strict 8-part JSON report with a Final Verdict (Approved/Rejected/Review).
 
 ## 📂 Project Structure
 
