@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FileText, Cpu, FileJson, LayoutDashboard } from 'lucide-react';
+import { FileText, Cpu, FileJson, LayoutDashboard, GitCompare, LayoutTemplate } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const navItems = [
     { name: 'OCR & Analysis', path: '/ocr', icon: FileText },
     { name: 'Entity Extraction', path: '/entities', icon: Cpu },
     { name: 'Summarization', path: '/summary', icon: FileJson },
+    { name: 'Comparison', path: '/compare', icon: GitCompare },
+    { name: 'Smart Forms', path: '/forms', icon: LayoutTemplate },
 ];
 
 const Sidebar: React.FC = () => {

@@ -3,6 +3,8 @@ import MainLayout from './components/layout/MainLayout';
 import OCRView from './components/features/OCRView';
 import EntityView from './components/features/EntityView';
 import SummaryView from './components/features/SummaryView';
+import CompareView from './components/features/CompareView';
+import FormView from './components/features/FormView';
 import { ToastProvider } from './components/ui/ToastContext';
 import { useAxiosInterceptor } from './components/ui/useAxiosInterceptor';
 
@@ -34,6 +36,9 @@ function App() {
                 <Route index element={<SummaryView />} />
                 <Route path=":id" element={<SummaryView />} />
               </Route>
+
+              <Route path="compare" element={<CompareView />} />
+              <Route path="forms" element={<FormView />} />
             </Route>
           </Routes>
         </BrowserRouter>

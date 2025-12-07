@@ -22,7 +22,17 @@ A state-of-the-art document analysis system that leverages Generative AI (Google
 *   **Interactive View**: Explore relationships and hierarchies visually.
 *   **Expansion Mode**: Full-screen modal view for navigating large, complex diagrams.
 
-### 4. RAG (Retrieval-Augmented Generation)
+### 4. Intelligent Document Comparison
+*   **Diff Analysis**: Compare two versions of a document to highlight additions, deletions, and semantic changes.
+*   **Detailed Reports**: View a line-by-line breakdown of changes with severity scoring (Critical, High, Medium, Low).
+*   **Visual Diff**: Color-coded side-by-side view (Coming Soon) and detailed table modal.
+
+### 5. Smart Form Filling
+*   **Auto-Fill**: Automatically extracts data from documents to populate complex forms.
+*   **Split-View UI**: Verified extraction values against the source document in a convenient split-pane interface.
+*   **Editable JSON**: Support for complex array editing (e.g., Education History, Work Experience) directly in the UI.
+
+### 6. RAG (Retrieval-Augmented Generation)
 *   **Contextual Intelligence**: Enrich extraction results with broader context using RAG pipelines.
 *   **Status Tracking**: Real-time monitoring of RAG processing steps (Upload -> Visual -> Enrich -> RAG).
 
@@ -115,9 +125,19 @@ The frontend will be available at `http://localhost:5173`.
     ```
 5.  Click **"Extract"** to get structured data.
 
-### View Summaries
-1.  Go to the **Summaries** tab.
-2.  Select a document to read its AI-generated executive summary.
+### Compare Documents
+1.  Go to the **Comparison** tab.
+2.  Select a "Source" (Original) and "Target" (New) document from your processed files.
+3.  Click **"Run Comparison"**.
+4.  View the high-level summary cards (Similarity Score, Additions, Deletions).
+5.  Click **"View Detailed Difference Report"** to see a full table of changes.
+
+### Smart Forms
+1.  Go to the **Smart Forms** tab.
+2.  Select a document to auto-fill data from.
+3.  Define your Target Schema (or use the default example).
+4.  Click **"Auto-Fill Form"**.
+5.  Review the generated form on the right. Edit fields as needed—even complex lists like "Education" have dedicated, editable cards!
 
 ## 🤝 Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
