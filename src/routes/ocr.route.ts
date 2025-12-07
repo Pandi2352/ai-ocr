@@ -116,6 +116,18 @@ router.get('/status/:id', getFileStatus);
  *           type: integer
  *           default: 10
  *         description: Items per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by filename
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order (by date)
  *     responses:
  *       200:
  *         description: List of files

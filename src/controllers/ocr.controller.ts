@@ -264,12 +264,19 @@ export const getFileStatus = async (req: Request, res: Response, next: NextFunct
 
 export const getFiles = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { page, limit } = req.query;
+        const { page, limit, search, order } = req.query;
         const { skip, limit: limitNum, page: pageNum } = getPagination(page as string, limit as string);
 
-        const total = await OCRResult.countDocuments();
-        const files = await OCRResult.find()
-            .sort({ createdAt: -1 })
+        const filter: any = {};
+        if (search) {
+            filter.originalName = { $regex: search, $options: 'i' };
+        }
+
+        const sortDirection = order === 'asc' ? 1 : -1;
+
+        const total = await OCRResult.countDocuments(filter);
+        const files = await OCRResult.find(filter)
+            .sort({ createdAt: sortDirection })
             .skip(skip)
             .limit(limitNum)
             .select('-analysis'); // Exclude heavy fields
