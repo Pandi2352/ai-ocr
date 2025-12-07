@@ -6,6 +6,9 @@ import SummaryView from './components/features/SummaryView';
 import CompareView from './components/features/CompareView';
 import FormView from './components/features/FormView';
 import IdentityView from './components/features/IdentityView';
+import ResumeView from './components/features/ResumeView';
+import ImageView from './components/features/ImageView';
+import RagChatView from './components/features/RagChatView';
 import { ToastProvider } from './components/ui/ToastContext';
 import { useAxiosInterceptor } from './components/ui/useAxiosInterceptor';
 
@@ -41,6 +44,9 @@ function App() {
               <Route path="compare" element={<CompareView />} />
               <Route path="forms" element={<FormView />} />
               <Route path="identity" element={<IdentityView />} />
+              <Route path="resume" element={<ResumeView />} />
+              <Route path="image" element={<ImageView />} />
+              <Route path="rag" element={<RagChatView />} />
             </Route>
           </Routes>
         </BrowserRouter>
