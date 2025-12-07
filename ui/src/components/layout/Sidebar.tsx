@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FileText, Cpu, FileJson, LayoutDashboard, GitCompare, LayoutTemplate } from 'lucide-react';
+import { FileText, Cpu, FileJson, LayoutDashboard, GitCompare, LayoutTemplate, Fingerprint } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
     { name: 'Summarization', path: '/summary', icon: FileJson },
     { name: 'Comparison', path: '/compare', icon: GitCompare },
     { name: 'Smart Forms', path: '/forms', icon: LayoutTemplate },
+    { name: 'Identity Verify', path: '/identity', icon: Fingerprint },
 ];
 
 const Sidebar: React.FC = () => {

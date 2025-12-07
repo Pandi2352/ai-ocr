@@ -32,11 +32,20 @@ A state-of-the-art document analysis system that leverages Generative AI (Google
 *   **Split-View UI**: Verified extraction values against the source document in a convenient split-pane interface.
 *   **Editable JSON**: Support for complex array editing (e.g., Education History, Work Experience) directly in the UI.
 
-### 6. RAG (Retrieval-Augmented Generation)
+### 6. Identity Verification & Fraud Detection
+*   **Multi-Document Analysis**: Compare ID proofs (e.g., Passport, Aadhaar) against supporting docs (PAN, Selfie) for consistency.
+*   **Fraud Dashboard**: Status badges for `APPROVED`, `REJECTED`, or `MANUAL_REVIEW`, with a calculated Risk Score (Low/High).
+*   **Granular Checks**: 
+    *   **Face Match**: AI comparison of photos across documents.
+    *   **Field Matching**: Exact/Fuzzy matching logic for Name, DOB, Parent Name, etc.
+    *   **Fraud Signals**: Detects potential tampering or forgery indicators.
+*   **Visual Logic**: "Pass/Fail" indicators for every check point.
+
+### 7. RAG (Retrieval-Augmented Generation)
 *   **Contextual Intelligence**: Enrich extraction results with broader context using RAG pipelines.
 *   **Status Tracking**: Real-time monitoring of RAG processing steps (Upload -> Visual -> Enrich -> RAG).
 
-### 5. Modern User Interface
+### 8. Modern User Interface
 *   **Dark Mode Aesthetic**: sleek, professional UI designed for data density and readability.
 *   **Real-time Updates**: Live status badges and progress monitoring.
 *   **Responsive**: Fully responsive layout optimized for desktop and tablet data review.
@@ -138,6 +147,17 @@ The frontend will be available at `http://localhost:5173`.
 3.  Define your Target Schema (or use the default example).
 4.  Click **"Auto-Fill Form"**.
 5.  Review the generated form on the right. Edit fields as needed—even complex lists like "Education" have dedicated, editable cards!
+
+### Identity Verification
+1.  Go to the **Identity Verify** tab.
+2.  **Select Identity Proof**: Choose your primary ID (e.g., Aadhaar Card).
+3.  **Select Supporting Doc**: Choose your secondary ID (e.g., PAN Card or Selfie).
+4.  Click **"Verify Identity"**.
+5.  Review the dashboard:
+    *   Check the Overall Status (Approved/Rejected) and Risk Score.
+    *   Read the **Executive Summary** for the AI's reasoning.
+    *   Inspect the **Field-Level Matching** table to see exactly which data points matched or mismatched.
+    *   View **Face Verification** confidence scores.
 
 ## 🤝 Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
