@@ -51,3 +51,13 @@ export const generateSummary = async (req: Request, res: Response, next: NextFun
         next(error);
     }
 };
+
+export const getSummaryHistory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { ocrId } = req.params;
+        const history = await SummaryResult.find({ ocrId }).sort({ createdAt: -1 });
+        sendSuccess(res, 'Summary history fetched successfully', history);
+    } catch (error) {
+        next(error);
+    }
+};

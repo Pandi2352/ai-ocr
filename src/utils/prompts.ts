@@ -157,14 +157,22 @@ You are an expert content summarizer. Your task is to provide a comprehensive an
 5.  **Format**: Markdown.
 `;
 
-export const generateEntityPrompt = (fields: string[]): string => {
-    const fieldsList = fields.map((f, i) => `${i + 1}. ${f}`).join('\n');
+export const generateEntityPrompt = (fields: string[] | any): string => {
+  let jsonStructure;
+  let fieldsList = '';
 
+  if (Array.isArray(fields)) {
+    fieldsList = fields.map((f, i) => `${i + 1}. ${f}`).join('\n');
     // Helper to convert field name to snake_case for the example structure
     const toSnakeCase = (str: string) => str.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^\w_]/g, '');
-    const jsonStructure = fields.reduce((acc, curr) => ({ ...acc, [toSnakeCase(curr)]: "..." }), {});
+    jsonStructure = fields.reduce((acc, curr) => ({ ...acc, [toSnakeCase(curr)]: "..." }), {});
+  } else {
+    // Assume fields is a valid JSON schema object
+    jsonStructure = fields;
+    fieldsList = "Extract entities matching the structure below.";
+  }
 
-    return `
+  return `
 You are an expert entity extractor. Extract the following entities from the provided text and return them in strict JSON format.
 
 Entities to extract:
@@ -180,7 +188,7 @@ ${JSON.stringify(jsonStructure, null, 2)}
 };
 
 export const generateFormPrompt = (schema: any): string => {
-    return `
+  return `
 You are an intelligent form-filling assistant. Your task is to map extracted text from a document to a strictly defined JSON schema.
 
 **Input Schema**:

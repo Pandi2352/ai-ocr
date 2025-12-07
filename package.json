@@ -26,10 +26,12 @@
     "mime-types": "^3.0.2",
     "mongoose": "^8.0.3",
     "multer": "^2.0.2",
+    "react-markdown": "^10.1.0",
     "sharp": "^0.34.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

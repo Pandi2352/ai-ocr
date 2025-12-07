@@ -1,7 +1,33 @@
 import { Router } from 'express';
-import { generateSummary } from '../controllers/summary.controller';
+import { generateSummary, getSummaryHistory } from '../controllers/summary.controller';
+import { getSummaries } from '../controllers/ocr.controller';
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/summary:
+ *   get:
+ *     summary: List generated summaries
+ *     tags: [Summary]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of summaries
+ */
+router.get('/', getSummaries);
 
 /**
  * @swagger
@@ -28,5 +54,23 @@ const router = Router();
  *         description: Generated summary
  */
 router.post('/', generateSummary);
+
+/**
+ * @swagger
+ * /api/summary/history/{ocrId}:
+ *   get:
+ *     summary: Get summary generation history for a specific file
+ *     tags: [Summary]
+ *     parameters:
+ *       - in: path
+ *         name: ocrId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Summary history list
+ */
+router.get('/history/:ocrId', getSummaryHistory);
 
 export default router;

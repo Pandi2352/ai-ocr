@@ -5,6 +5,7 @@ export interface IEntityResult extends Omit<Document, '_id'> {
     _id: string;
     ocrId: string;
     entities: Record<string, string | null>; // Dynamic object
+    fields?: string[] | any;
     createdAt: Date;
 }
 
@@ -12,7 +13,8 @@ const EntityResultSchema: Schema = new Schema(
     {
         _id: { type: String, default: generateUUID },
         ocrId: { type: String, required: true, ref: 'OCRResult' },
-        entities: { type: Schema.Types.Mixed, default: {} } // Allow any structure
+        entities: { type: Schema.Types.Mixed, default: {} }, // Allow any structure
+        fields: { type: Schema.Types.Mixed, default: [] }
     },
     { timestamps: true }
 );

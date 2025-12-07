@@ -27,8 +27,9 @@ export const extractEntities = async (req: Request, res: Response, next: NextFun
         }
 
         let prompt;
-        if (fields && Array.isArray(fields) && fields.length > 0) {
-            logger.info(`Starting entity extraction for ${ocrId} with fields: ${fields.join(', ')}`);
+
+        if (fields && (Array.isArray(fields) && fields.length > 0 || Object.keys(fields).length > 0)) {
+            logger.info(`Starting entity extraction for ${ocrId} with custom fields`);
             const dynamicPrompt = generateEntityPrompt(fields);
             prompt = `${dynamicPrompt}\n\nTEXT TO ANALYZE:\n${ocrRecord.analysis}`;
         } else {
@@ -52,7 +53,8 @@ export const extractEntities = async (req: Request, res: Response, next: NextFun
 
         const result = await EntityResult.create({
             ocrId: ocrRecord._id,
-            entities: entities
+            entities: entities,
+            fields: fields || []
         });
 
         // Also save to OCRResult as requested
@@ -61,6 +63,16 @@ export const extractEntities = async (req: Request, res: Response, next: NextFun
 
         sendSuccess(res, 'Entities extracted successfully', result);
 
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getEntityHistory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { ocrId } = req.params;
+        const history = await EntityResult.find({ ocrId }).sort({ createdAt: -1 });
+        sendSuccess(res, 'Entity history fetched successfully', history);
     } catch (error) {
         next(error);
     }

@@ -251,9 +251,15 @@ export const getFileStatus = async (req: Request, res: Response, next: NextFunct
                 ...ocrRecord.timing,
                 duration
             },
-            filename: ocrRecord.originalName,
+            filename: ocrRecord.filename, // Storage filename
+            originalName: ocrRecord.originalName, // Original upload name
+            mimetype: ocrRecord.mimetype,
+            size: ocrRecord.size,
             metadata: ocrRecord.metadata,
             mindmap: ocrRecord.mindmap,
+            analysis: ocrRecord.analysis, // Include analysis
+            summary: ocrRecord.summary, // Include summary
+            entityResult: ocrRecord.entityResult, // Include entityResult
             createdAt: ocrRecord.createdAt
         });
 
@@ -282,6 +288,72 @@ export const getFiles = async (req: Request, res: Response, next: NextFunction) 
             .select('-analysis'); // Exclude heavy fields
 
         sendSuccess(res, 'Files retrieved successfully', {
+            data: files,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum)
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getSummaries = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { page, limit, search, order } = req.query;
+        const { skip, limit: limitNum, page: pageNum } = getPagination(page as string, limit as string);
+
+        const filter: any = { summary: { $ne: '' } }; // Only fetch items with a summary
+        if (search) {
+            filter.originalName = { $regex: search, $options: 'i' };
+        }
+
+        const sortDirection = order === 'asc' ? 1 : -1;
+
+        const total = await OCRResult.countDocuments(filter);
+        const files = await OCRResult.find(filter)
+            .sort({ createdAt: sortDirection })
+            .skip(skip)
+            .limit(limitNum)
+            .select('originalName summary createdAt status mimetype');
+
+        sendSuccess(res, 'Summaries retrieved successfully', {
+            data: files,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum)
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getEntities = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { page, limit, search, order } = req.query;
+        const { skip, limit: limitNum, page: pageNum } = getPagination(page as string, limit as string);
+
+        const filter: any = { entityResult: { $ne: {} } }; // Only fetch items with entities
+        if (search) {
+            filter.originalName = { $regex: search, $options: 'i' };
+        }
+
+        const sortDirection = order === 'asc' ? 1 : -1;
+
+        const total = await OCRResult.countDocuments(filter);
+        const files = await OCRResult.find(filter)
+            .sort({ createdAt: sortDirection })
+            .skip(skip)
+            .limit(limitNum)
+            .select('originalName entityResult createdAt status mimetype');
+
+        sendSuccess(res, 'Entities retrieved successfully', {
             data: files,
             pagination: {
                 total,

@@ -1,181 +1,123 @@
-# Intelligent Multimodal OCR & Content Analysis Service
+# AI-Powered OCR & Document Intelligence Platform
 
-A powerful backend service built with Node.js, Express, and Google Gemini AI that goes beyond traditional OCR. It analyzes text, documents (PDF, DOCX), images, audio, and video files to extract content, generate structured metadata, and create visual mindmaps.
+A state-of-the-art document analysis system that leverages Generative AI (Google Gemini) to transform static documents into structured data, actionable insights, and visual knowledge graphs.
+
+![Application Preview](https://via.placeholder.com/800x400?text=AI+OCR+Platform+Dashboard+Preview)
 
 ## 🚀 Key Features
 
-- **Multimodal Analysis**: extracts text and insights from:
-  - **Documents**: PDF, DOCX, TXT, CSV
-  - **Images**: JPG, PNG, WEBP (includes scene description & text extraction)
-  - **Audio**: MP3, WAV (transcription & summary)
-  - **Video**: MP4 (scene breakdown, speech analysis, summary)
-- **Background Enrichment**:
-  - **Mermaid.js Mindmaps**: Automatically generates structured mindmaps representing the core content of the document.
-  - **Named Entity Extraction**: Extracts specific data (like Names, Dates, IDs) into structured JSON with **snake_case** keys. Support for both automatic detection and user-specified fields.
-  - **Document Summarization**: Generates comprehensive summaries via API. Supports both automatic default summaries and user-guided summaries via custom prompts.
-  - **Auto-filling Forms**: "Smart Mapper" that takes a target JSON schema (e.g., from a KYC form) and intelligently maps extracted content to it, transforming formats as needed.
-  - **RAG Chatbot**: Chat with your documents. Supports "Single Turn Search" (Direct Q&A) and "Multi-Turn Chat" (Conversational with history). Includes **Lazy Ingestion** (auto-indexing).
-  - **Image Generation**: Generates a high-quality photorealistic image of the document based on the extracted content (e.g., recreating an ID card or Invoice view). Uses advanced prompting to ensure text accuracy and legibility.
-  - **Advanced Document Comparison**: Intelligently compares two documents (Original vs New) to identify distinct changes (added, removed, modified). Categorizes changes by severity (Critical, High, Medium, Low) and type (Financial, Legal, Formatting).
-  - **Identity Verification & Fraud Detection**: Performs forensic analysis between two ID documents. Checks for **Face Matching** (Photo-to-Photo), **Address Consistency** (Fuzzy matching), **Fraud Indicators** (Tampering, Font mismatch), and extracts dynamic fields for comparison.
-  - **Resume Parsing & Job Matching**: Parses candidate resumes and intelligently scores them against a provided Job Description. Extracts Skills, Experience, and Education, then generates a Match Score (0-100) with detailed gap analysis.
-- **Asynchronous Processing**: Immediate API response with background polling for heavy tasks.
-- **Robust Tracking**: Detailed status tracking (upload, visual processing, enrichment) and timing metrics.
-- **Swagger Documentation**: Built-in API docs for easy testing.
+### 1. Intelligent OCR & Analysis
+*   **Beyond Text**: Goes far beyond traditional OCR by understanding context, layout, and semantics.
+*   **Multi-Format Support**: Handles PDFs, Images (JPG, PNG), Word Docs, and more.
+*   **Executive Summaries**: Automatically generates concise, human-readable summaries of complex documents.
+*   **Deep Analysis**: Provides detailed, section-by-section breakdown and analysis of document content.
 
-## 🛠️ Tech Stack
+### 2. Advanced Entity Extraction
+*   **Flexible Extraction**: Define *exactly* what you want to extract (e.g., "Invoice Number", "Date", "Line Items").
+*   **JSON Schema Support**: Use advanced JSON schemas to extract complex, nested data structures (e.g., arrays of objects) with strict typing.
+*   **Structured Output**: Returns clean, machine-readable JSON ready for API integration.
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB (Mongoose) - Stores analysis results & metadata.
-- **AI Engine**: Google Gemini 1.5 Flash (via `@google/generative-ai`)
-- **Tools**:
-  - `mammoth` (DOCX parsing)
-  - `multer` (File uploads)
-  - `swagger-jsdoc` / `swagger-ui-express` (Documentation)
+### 3. Visual Knowledge Graph (Mindmap)
+*   **Instant Visualization**: Automatically converts document concepts into a Mermaid.js mindmap.
+*   **Interactive View**: Explore relationships and hierarchies visually.
+*   **Expansion Mode**: Full-screen modal view for navigating large, complex diagrams.
 
-## ⚙️ prerequisites
+### 4. RAG (Retrieval-Augmented Generation)
+*   **Contextual Intelligence**: Enrich extraction results with broader context using RAG pipelines.
+*   **Status Tracking**: Real-time monitoring of RAG processing steps (Upload -> Visual -> Enrich -> RAG).
 
-- Node.js (v18+)
-- MongoDB (Local or Atlas connection string)
-- Google Gemini API Key
+### 5. Modern User Interface
+*   **Dark Mode Aesthetic**: sleek, professional UI designed for data density and readability.
+*   **Real-time Updates**: Live status badges and progress monitoring.
+*   **Responsive**: Fully responsive layout optimized for desktop and tablet data review.
 
-## 📦 Installation & Setup
+## 🛠️ Technology Stack
 
-1.  **Clone the repository** (if applicable) and navigate to the directory:
+### Frontend
+*   **Framework**: React 18 (Vite)
+*   **Language**: TypeScript
+*   **Styling**: Tailwind CSS (with `tailwindcss-animate`)
+*   **Visualization**: Mermaid.js (for diagrams), Lucide React (icons)
+*   **State/API**: Axios, Custom Hooks
 
-    ```bash
-    cd ocr
-    ```
+### Backend
+*   **Runtime**: Node.js
+*   **Framework**: Express.js
+*   **Database**: MongoDB (Mongoose)
+*   **AI Model**: Google Gemini 1.5 Flash (via Google AI Studio)
+*   **File Processing**: Multer, Mammoth (Docx), PDF-Parse
 
-2.  **Install dependencies**:
+## ⚡ Quick Start
 
-    ```bash
-    npm install
-    ```
+### Prerequisites
+*   Node.js (v18+)
+*   MongoDB (Local or Atlas)
+*   Google Gemini API Key
 
-3.  **Environment Configuration**:
-    Create a `.env` file in the root directory (copy from `.env.example`):
+### 1. Backend Setup
 
-    ```bash
-    cp .env.example .env
-    ```
+```bash
+# Clone the repository
+git clone <repo-url>
+cd ocr
 
-    Update the `.env` file with your credentials:
+# Install dependencies
+npm install
 
-    ```env
-    PORT=3000
-    MONGODB_URI=mongodb://localhost:27017/ai-ocr-db
-    GEMINI_API_KEY=your_google_gemini_api_key_here
-    ```
+# Configure Environment
+# Create a .env file based on .env.example
+cp .env.example .env
 
-4.  **Run the application**:
-    - **Development** (with hot-reload):
-      ```bash
-      npm run dev
-      ```
-    - **Production**:
-      ```bash
-      npm run build
-      npm start
-      ```
-
-## 📖 API Documentation
-
-Once the server is running, visit the Swagger UI for interactive documentation:
-
-👉 **http://localhost:3000/api-docs**
-
-### Core Endpoints
-
-| Method   | Endpoint              | Description                                                                                    |
-| :------- | :-------------------- | :--------------------------------------------------------------------------------------------- |
-| **POST** | `/api/ocr/analyze`    | Upload a file for analysis. Returns an ID immediately.                                         |
-| **GET**  | `/api/ocr/status/:id` | Check analysis status and retrieve results (Extraction + Mindmap + Entities).                  |
-| **POST** | `/api/entities`       | Extract named entities from an existing OCR result. Supports Auto/Manual modes.                |
-| **POST** | `/api/summary`        | Generate a summary. Supports Auto (comprehensive) or Manual (custom instruction) modes.        |
-| **POST** | `/api/forms/fill`     | Smart Form Filling. Maps OCR content to a specific target JSON schema provided in the payload. |
-| **POST** | `/api/rag/search`     | **Single-Turn Q&A**. Ask a question, get a direct answer. (Auto-indexes document).             |
-| **POST** | `/api/rag/chat`       | **Multi-Turn Chat**. Conversational interface supporting history.                              |
-| **POST** | `/api/image/generate` | **Generate Image**. Creates a visual representation of the document based on OCR data.         |
-| **POST** | `/api/compare`        | **Compare Documents**. Analyze changes between a Source and Target document.                    |
-| **POST** | `/api/identity/verify`| **Verify Identity**. Forensic comparison of two documents (Face, Fraud, Data).                 |
-| **GET**  | `/api/identity/history`| **Identity History**. Get past verification results.                                           |
-| **POST** | `/api/resume/analyze` | **Analyze Resume**. Parse resume and match against JD.                                         |
-| **GET**  | `/api/resume/history` | **Resume History**. Get past analysis results.                                                 |
-| **GET**  | `/api/ocr/list`       | List all processed files with pagination.                                                      |
-| **POST** | `/api/ai/generate`    | (Test) Simple text generation with Gemini.                                                     |
-| **GET**  | `/health`             | Server health check.                                                                           |
-
-## 🧩 How It Works
-
-1.  **Upload**: User uploads a file to `/api/ocr/analyze`.
-2.  **Visual Processing (Sync)**:
-    - Server identifies file type.
-    - **Docs**: Text is extracted natively.
-    - **Media**: File is uploaded to Gemini for multimodal understanding.
-    - **LLM Pass 1**: Extracts structured content, metadata (Title, Description, Thumbnail prompt), and raw analysis.
-3.  **Response**: Server returns `200 OK` with the Record ID and initial analysis.
-4.  **Enrichment (Async Background)**:
-    - Server stays alive in background.
-    - **Mindmap Generation**: LLM analyzes the extracted content to generate a valid Mermaid.js mindmap syntax.
-    - Updates the database record with the mindmap string.
-5.  **Polling**: Client polls `/api/ocr/status/:id` until `status.enrichment` is `SUCCESS` to get the full result.
-6.  **Entity Extraction (On-Demand)**:
-    - Call `/api/entities` with `ocrId`.
-    - **Auto Mode**: Send just `ocrId` -> AI detects keys (e.g., `candidate_name`, `invoice_date`).
-    - **Manual Mode**: Send `ocrId` + `fields: ["Father Name", "DOB"]` -> AI extracts specific values into snake_case keys (`father_name`, `dob`).
-    - Results are saved to both the `EntityResult` collection and the `OCRResult` document.
-7.  **Document Summarization (On-Demand)**:
-    - Call `/api/summary` with `ocrId`.
-    - **Auto Mode**: Send just `ocrId` -> AI generates a detailed standard summary.
-    - **Manual Mode**: Send `ocrId` + `prompt: "Summarize as a tweet"` -> AI follows your specific instruction.
-    - Results are saved to both the `SummaryResult` collection and the `OCRResult` document.
-8.  **Auto-filling Forms (On-Demand)**:
-    - Call `/api/forms/fill` with `ocrId` and a strict `schema` object (e.g., `{ "full_name": "String", "dob": "DD-MM-YYYY" }`).
-    - AI extracts the data, transforms values to match your specific formats (e.g., standardizing dates), and reports any missing fields.
-    - Results are saved to the `FormResult` collection _only_ (keeping your form data separate).
-9.  **RAG Chatbot (Conversational Search)**:
-    - **Smart Search**: Call `/api/rag/search` with `{ "question": "..." }`.
-    - **Conversational**: Call `/api/rag/chat` with `{ "question": "...", "history": [...] }`.
-    - **Lazy Ingestion**: If the document hasn't been indexed in the Vector DB yet, the system automatically chunks and indexes it before answering. No manual setup required.
-10. **Image Generation (Visual Reconstruction)**:
-    - Call `/api/image/generate` with `{ "ocrId": "..." }`.
-    - AI analyzes the document content (and any extracted entities) to construct a highly specific prompt.
-    - Generates a photorealistic image mirroring the document's data.
-    - Saves the image to the server (`uploads/generated/`) and returns the public URL.
-11. **Document Comparison**:
-    - Select two document IDs (Source & Target).
-    - Call `/api/compare` with `{ "sourceId": "...", "targetId": "..." }`.
-    - AI analyzes the text of both documents side-by-side.
-    - Returns a JSON report detailing every change, its severity, and category.
-12. **Identity Verification**:
-    - Select two document IDs (e.g., ID Card and Uploaded Selfie/Doc).
-    - Call `/api/identity/verify` with `{ "docA_Id": "...", "docB_Id": "..." }`.
-    - AI performs multi-modal checks: Face Match, Text Anti-Fraud, Address Match.
-    - Returns a strict 8-part JSON report with a Final Verdict (Approved/Rejected/Review).
-12. **Resume Parsing & Matching**:
-    - Upload a resume via `/api/ocr/analyze` to get an `ocrId`.
-    - Call `/api/resume/analyze` with `{ "ocrId": "...", "job_description": "..." }`.
-    - AI extracts candidate profile (Skills, Experience, Projects).
-    - AI matches candidate against JD and calculates a Match %, identifying Gaps and Missing Skills.
-    - Returns a comprehensive JSON report.
-
-## 📂 Project Structure
-
-```
-src/
-├── config/         # DB and Swagger config
-├── controllers/    # Request handlers (OCR logic)
-├── exceptions/     # Custom error classes
-├── middlewares/    # Upload, validation, error handling
-├── models/         # Mongoose schemas (OCRResult)
-├── routes/         # API Route definitions
-├── utils/          # Helpers (LLM, Logger, Response, Prompts)
-├── app.ts          # Express App setup
-└── server.ts       # Entry point
+# Start the server (Development)
+npm run dev
 ```
 
-## 📜 License
+**Required `.env` Variables:**
+```env
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/ai-ocr
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-PANDI SELVAM
+### 2. Frontend Setup
+
+```bash
+# Navigate to UI directory
+cd ui
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
+
+## 📖 Usage Guide
+
+### Upload & Analyze
+1.  Navigate to the **OCR** tab.
+2.  Click **"Upload Document"** and select a file.
+3.  Watch as the system processes the file in real-time (Upload -> Visual -> Enrich).
+
+### Extract Data (Entity View)
+1.  Go to the **Entities** tab.
+2.  Select a processed document.
+3.  **Simple Mode**: Enter fields like `Invoice No, Date, Total`.
+4.  **JSON Mode**: Paste a JSON schema for complex extraction:
+    ```json
+    {
+      "items": [
+        { "name": "string", "price": "number" }
+        ]
+    }
+    ```
+5.  Click **"Extract"** to get structured data.
+
+### View Summaries
+1.  Go to the **Summaries** tab.
+2.  Select a document to read its AI-generated executive summary.
+
+## 🤝 Contributing
+Contributions are welcome! Please fork the repository and submit a pull request.
